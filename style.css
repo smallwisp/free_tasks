@@ -2,11 +2,11 @@
   box-sizing: border-box;
 }
 
-body {
-  background-color: #fff;
-}
-
 button {
   padding: 10px 5px;
   font-size: 18px;
 }
+
+/* li {
+  list-style-type: disc;
+} */
