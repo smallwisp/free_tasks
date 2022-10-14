@@ -1,7 +1,8 @@
 const signUpBtn = document.querySelector('.btn-sign-up'),
       loginBtn = document.querySelector('.btn-login'),
       title = document.querySelector('.title'),
-      list = document.querySelector('#list');
+      list = document.querySelector('#list'),
+      ruMonths = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентярбря', 'Октября', 'Ноября', 'Декабря'];
 
 let users = [];
 
@@ -14,19 +15,30 @@ const clearStorage = () => {
 
 clearStorage();
 
+console.log(users);
+
 for (const value of Object.values(localStorage )) {
   let item = JSON.parse(value);
   users.push(item);
 }
+render();
+console.log(list.children);
 
-console.log(users);
+function render() {
+  if (list.children.length !== 0) list.innerHTML = '';
+  users.forEach(item => {
+    let li = document.createElement('li');
+    li.textContent = `Имя: ${item.name}, фамилия: ${item.surname}, зарегистрирован: ${item.regDate}`;
+    li.setAttribute('style', `list-style-type: disc`);
+    list.append(li);
+    
+    let btnDelete = document.createElement('button');
+    btnDelete.textContent = 'X';
+    btnDelete.classList.add('format');
+    li.append(btnDelete);
+  });
+}
 
-users.forEach(item => {
-  let li = document.createElement('li');
-  li.textContent = `Имя: ${item.name}, фамилия: ${item.surname}, зарегистрирован: ${item.regDate}`;
-  li.setAttribute('style', `list-style-type: disc`);
-  document.body.append(li);
-});
 
 signUpBtn.addEventListener('click', event => {
   let fullName = prompt('Введите свое имя и фамилию:', ''),
@@ -41,33 +53,45 @@ signUpBtn.addEventListener('click', event => {
       hours = date.getHours(),
       minutes = date.getMinutes(),
       seconds = date.getSeconds();
-  
-  const ruMonths = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентярбря', 'Октября', 'Ноября', 'Декабря'];
+      
+      
+      const regDate = `${day} ${ruMonths[month]} ${year} г., ${hours}:${minutes}:${(seconds < 10) ? '0' + seconds : seconds}`;
+      
+      let user = {
+        name: name,
+        surname: surname,
+        login: login,
+        password: password,
+        regDate: regDate,
+      };
+      
+      users.push(user);
+      
+      render();
+      console.log(users);
+      
+      users.forEach((item, index) => {
+        let itemJSON = JSON.stringify(item);
+        localStorage.setItem(index, itemJSON);
+      })
+    });
+    
+const btnDelete = document.querySelectorAll('.format');
 
-  const regDate = `${day} ${ruMonths[month]} ${year} г., ${hours}:${minutes}:${(seconds < 10) ? '0' + seconds : seconds}`;
-
-  let user = {
-    name: name,
-    surname: surname,
-    login: login,
-    password: password,
-    regDate: regDate,
-  };
-
-  users.push(user);
-
-  console.log(users);
-
-  let li = document.createElement('li');
-  li.textContent = `Имя: ${users[users.length - 1].name}, фамилия: ${users[users.length - 1].surname}, зарегистрирован: ${users[users.length - 1].regDate}`;
-  li.setAttribute('style', `list-style-type: disc`);
-  document.body.append(li);
-
-  users.forEach((item, index) => {
-    let itemJSON = JSON.stringify(item);
-    localStorage.setItem(index, itemJSON);
+btnDelete.forEach((item, index) => {
+  item.addEventListener('click', () => {
+    console.log(item.parentNode);
+    item.parentNode.remove();
+    // users.splice(1, index);
+    // render();
   })
+})
+
+loginBtn.addEventListener('click', () => {
+  let inputLogin = prompt('Введите логин:', '');
+  let inputPassword = prompt('Введите пароль:', '');
+
+  let user = users.find(item => ( item.login === inputLogin ) || (item.password === inputPassword));
+
+  title.textContent = user.name;
 });
-
-
-// console.log(localStorage.length);
